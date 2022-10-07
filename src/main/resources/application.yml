@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: jdbc:clickhouse:http://localhost:8123
+    driver-class-name: com.clickhouse.jdbc.ClickHouseDriver
+    database: tutorial
+    username: default
+    password:
+  hikari:
+    connection-timeout: 2000
+    maximum-pool-size: 5
+
+  jpa:
+      hibernate:
+        #            ddl-auto: validate
+        naming:
+          implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
+          physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+      open-in-view: false
+      show-sql: true
