@@ -1,7 +1,7 @@
 package com.example.hellospring.services;
 
 import com.example.hellospring.domain.entities.Error;
-import com.example.hellospring.domain.specificaitons.ErrorSpecification;
+import com.example.hellospring.domain.projections.ErrorProjection;
 import com.example.hellospring.repository.ErrorRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,15 +25,15 @@ public class ErrorService {
     }
 
     public String getAggregatesByNativeQuery() {
-        List<ErrorSpecification> errorSpecifications = errorRepository.findByNativeQuery(1440L,
+        List<ErrorProjection> errorProjections = errorRepository.findByNativeQuery(1440L,
                 1546300800L,
                 1546387140L, "Roboter X");
 
         StringBuilder result = new StringBuilder();
 
-        for (ErrorSpecification errorSpecification: errorSpecifications){
-            result.append(String.format("%s %s <br>", errorSpecification.getErrorType(),
-                    errorSpecification.getAvgVal()));
+        for (ErrorProjection errorProjection : errorProjections){
+            result.append(String.format("%s %s <br>", errorProjection.getErrorType(),
+                    errorProjection.getAvgVal()));
         }
 
         return result.toString();

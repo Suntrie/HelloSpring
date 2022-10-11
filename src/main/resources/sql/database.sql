@@ -37,3 +37,13 @@ INSERT INTO tutorial.error (*) VALUES (4, 2,'2019-01-01 00:00:00', '2019-01-01 0
 INSERT INTO tutorial.error (*) VALUES (5, 2, '2019-01-02 00:00:00', '2019-01-02 01:00:00', 'Doer Y', 'fault#1');
 
 
+CREATE TABLE tutorial.recipes
+(
+    title String,
+    ingredients Array(String),
+    directions Array(String),
+    link String,
+    source LowCardinality(String),
+    NER Array(String)
+) ENGINE = MergeTree ORDER BY title;
+

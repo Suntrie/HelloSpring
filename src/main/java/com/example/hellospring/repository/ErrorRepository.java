@@ -1,7 +1,7 @@
 package com.example.hellospring.repository;
 
 import com.example.hellospring.domain.entities.Error;
-import com.example.hellospring.domain.specificaitons.ErrorSpecification;
+import com.example.hellospring.domain.projections.ErrorProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -23,15 +23,16 @@ public interface ErrorRepository extends JpaRepository<Error, Long> {
     List<Error> findAllByNonNativeQuery();
 
     @Query(
+            
             nativeQuery = true,
             value = "select (toFloat64(count(*)))/(toFloat64(:minutesNumber)) as avgVal, errorType as errorType from error " +
                     "where deviceType = :deviceType and " +
                     "startTime between :startTimeBegin and :startTimeEnd " +
                     "group by errorType")
-    List<ErrorSpecification> findByNativeQuery(@Param("minutesNumber") Long minutesNumber,
-                                               @Param("startTimeBegin") Long startTimeBegin,
-                                               @Param("startTimeEnd") Long startTimeEnd,
-                                               @Param("deviceType") String deviceType);
+    List<ErrorProjection> findByNativeQuery(@Param("minutesNumber") Long minutesNumber,
+                                            @Param("startTimeBegin") Long startTimeBegin,
+                                            @Param("startTimeEnd") Long startTimeEnd,
+                                            @Param("deviceType") String deviceType);
 
     @Query(
             nativeQuery = true,

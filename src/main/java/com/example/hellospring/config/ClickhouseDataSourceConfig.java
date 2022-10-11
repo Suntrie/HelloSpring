@@ -4,6 +4,7 @@ import com.clickhouse.client.config.ClickHouseClientOption;
 import com.clickhouse.jdbc.ClickHouseDataSource;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +36,7 @@ import java.util.Properties;
         }
 )
 @RequiredArgsConstructor
+@Data
 public class ClickhouseDataSourceConfig {
     @Value("${spring.datasource.driver-class-name}")
     private String driverClassName;
