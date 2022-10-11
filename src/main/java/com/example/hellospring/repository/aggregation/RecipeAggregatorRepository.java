@@ -8,6 +8,6 @@ import java.util.Map;
 
 public interface RecipeAggregatorRepository {
 
-    Map<String, Long> customQuery(SingularAttribute<Recipe, String> singularAttribute, Specification<Recipe> where); //TODO: что за типы здесь нужны?
+    Map<String, Long> groupAndCountHaving(SingularAttribute<Recipe, String> singularAttribute, Specification<Recipe> where); //TODO: что за типы здесь нужны?
 
 }
