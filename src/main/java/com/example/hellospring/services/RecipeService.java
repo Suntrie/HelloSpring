@@ -40,7 +40,7 @@ public class RecipeService {
     }
 
     public String getAggregatesByJavaSpec() {
-        return recipeRepository.customQuery(Recipe_.title, RecipeSpecification.createSpecificationByParams
+        return recipeRepository.groupAndCountHaving(Recipe_.title, RecipeSpecification.createSpecificationByParams
                 (RecipeConditionDTO.builder().build())).toString();
     }
 }
