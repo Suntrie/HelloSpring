@@ -42,6 +42,7 @@ public class ClickhouseDataSourceConfig {
     private String driverClassName;
     @Value("${spring.datasource.url}")
     private String url;
+
     @Value("${spring.datasource.database}")
     private String database;
     @Value("${spring.datasource.username}")

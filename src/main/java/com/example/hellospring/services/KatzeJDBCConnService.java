@@ -10,24 +10,16 @@ import java.sql.*;
 @Service
 @RequiredArgsConstructor
 public class KatzeJDBCConnService {
-    private final ClickhouseDataSourceConfig config;
-    private Connection conn;
 
-    @PostConstruct
-    public void initConn(){
-        try {
-            conn = DriverManager.getConnection(config.getUrl());
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    private final JDBCConnService jdbcConnService;
+
     public String getKatzen() throws SQLException {
 
         StringBuffer stringBuffer = new StringBuffer();
         String query = "SELECT * " +
                 "FROM tutorial.katze LIMIT 2";
 
-        try (PreparedStatement statement = conn.prepareStatement(query)) {
+        try (PreparedStatement statement = jdbcConnService.getConn().prepareStatement(query)) {
             try (ResultSet rs = statement.executeQuery()) {
                 while (rs.next()) {
                     stringBuffer.append(rs.getString("catName") + " " + rs.getInt("catId"));

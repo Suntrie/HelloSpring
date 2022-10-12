@@ -29,8 +29,10 @@ public class RecipeAggregatorRepositoryImpl implements RecipeAggregatorRepositor
         final Root<Recipe> root = query.from(Recipe.class);
         final Path<?> expression = root.get(singularAttribute);
 
+        var expressionCount =criteriaBuilder.prod(criteriaBuilder.count(root), 1000);
+
         //select multiple fields & custom operation
-        query.multiselect(expression, criteriaBuilder.prod(criteriaBuilder.count(root), 1000));
+        query.multiselect(expression, expressionCount);
 
         //add where clause from specification
         query.where(where.toPredicate(root, query, criteriaBuilder));
@@ -39,7 +41,7 @@ public class RecipeAggregatorRepositoryImpl implements RecipeAggregatorRepositor
         query.groupBy(expression);
 
         // having
-        query.having(criteriaBuilder.gt(criteriaBuilder.count(root.get(singularAttribute)), 1));
+        query.having(criteriaBuilder.gt(expressionCount, 1000));
 
         //custom ordering
         Expression<String> id = root.get(singularAttribute);
