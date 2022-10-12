@@ -1,7 +1,6 @@
 package com.example.hellospring.services;
 
 import com.example.hellospring.domain.dto.condition.RecipeConditionDTO;
-import com.example.hellospring.domain.entities.Recipe;
 import com.example.hellospring.domain.entities.Recipe_;
 import com.example.hellospring.repository.RecipeRepository;
 import com.example.hellospring.repository.spec.RecipeSpecification;
@@ -38,9 +37,9 @@ public class RecipeService {
     public String getAggregatesByHttpClickhouse() {
         return "TODO";
     }
-
     public String getAggregatesByJavaSpec() {
+        log.info("HELLO from spring");
         return recipeRepository.groupAndCountHaving(Recipe_.title, RecipeSpecification.createSpecificationByParams
-                (RecipeConditionDTO.builder().build())).toString();
+                (RecipeConditionDTO.builder().nameLikePattern("a").build())).toString();
     }
 }

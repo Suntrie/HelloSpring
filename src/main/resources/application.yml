@@ -17,3 +17,17 @@ spring:
           physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
       open-in-view: false
       show-sql: true
+
+logging:
+  level:
+    com.example.hellospring: debug
+  file:
+    path: hello-spring/logs
+  config: classpath:logback-spring.xml
+
+springdoc:
+  api-docs:
+    path: /open-api-docs
+  swagger-ui:
+    path: /swagger/index.html
+    operations-sorter: method

@@ -2,45 +2,59 @@ package com.example.hellospring.repository.aggregation;
 
 import com.example.hellospring.domain.entities.Recipe;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Tuple;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 import javax.persistence.metamodel.SingularAttribute;
 import java.util.List;
 import java.util.Map;
 
 import static java.util.stream.Collectors.toMap;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class RecipeAggregatorRepositoryImpl implements RecipeAggregatorRepository {
     private final EntityManager entityManager;
 
     @Override
-    public Map<String, Long> groupAndCountHaving(SingularAttribute<Recipe, String> singularAttribute, Specification<Recipe> where) //TODO: что за типы здесь нужны?
+    public Map<String, Long> groupAndCountHaving(SingularAttribute<Recipe, String> singularAttribute, Specification<Recipe> where)
     {
         final CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         final CriteriaQuery<Tuple> query = criteriaBuilder.createQuery(Tuple.class);
-        final Class entityClass = Recipe.class;
-        final Root<Recipe> root = query.from(entityClass);
+        final Root<Recipe> root = query.from(Recipe.class);
         final Path<?> expression = root.get(singularAttribute);
-        query.multiselect(expression, criteriaBuilder.count(root));
-        
-        //query.select(criteriaBuilder.tuple(expression, criteriaBuilder.count(root)));
-        //query.where(where.toPredicate(root, query, criteriaBuilder));
+
+        //select multiple fields & custom operation
+        query.multiselect(expression, criteriaBuilder.prod(criteriaBuilder.count(root), 1000));
+
+        //add where clause from specification
+        query.where(where.toPredicate(root, query, criteriaBuilder));
+
+        //groupBy
         query.groupBy(expression);
+
+        // having
+        query.having(criteriaBuilder.gt(criteriaBuilder.count(root.get(singularAttribute)), 1));
+
+        //custom ordering
+        Expression<String> id = root.get(singularAttribute);
+        Expression<?> sortExpression = criteriaBuilder.selectCase()
+                .when(criteriaBuilder.like(id, "%e%"), 1)
+                .otherwise(0);
+        query.orderBy(criteriaBuilder.asc(sortExpression));
 
         long startMillis = System.currentTimeMillis();
         final List<Tuple> resultList = entityManager.createQuery(query).getResultList();
         long endMillis = System.currentTimeMillis();
 
-        System.out.println(endMillis - startMillis);
+        log.info("time: {}", endMillis - startMillis);
+        log.info("Size: {}", resultList.size());
+
         return resultList.stream().
                 collect(toMap(
                         t -> t.get(0, String.class),

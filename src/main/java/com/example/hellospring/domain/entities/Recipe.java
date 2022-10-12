@@ -6,17 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-/*
-CREATE TABLE recipes
-        (
-        title String,
-        ingredients Array(String),
-        directions Array(String),
-        link String,
-        source LowCardinality(String),
-        NER Array(String)
-        ) ENGINE = MergeTree ORDER BY title;*/
-
+// Recipe table has 2kk+ of records
 @Entity
 @Data
 @Table(name = "recipes")
