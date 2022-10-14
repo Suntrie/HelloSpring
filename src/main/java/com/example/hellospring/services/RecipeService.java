@@ -7,6 +7,7 @@ import com.example.hellospring.repository.RecipeRepository;
 import com.example.hellospring.repository.spec.RecipeSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
 import java.sql.PreparedStatement;
@@ -32,7 +33,7 @@ public class RecipeService {
             " having count(recipe0_.title)*1000>1000 " +
             " order by case when recipe0_.title like ? then 1 else 0 end asc";
 
-    public String getAggregatesByJDBC() throws SQLException {
+    public Long getAggregatesByJDBC() throws SQLException {
 
         Map<String, Long> map = new HashMap<>();
 
@@ -40,6 +41,7 @@ public class RecipeService {
 
         long startMillis;
         long endMillis;
+        long duration;
 
         try (PreparedStatement statement = jdbcConnService.getConn().prepareStatement(query)) {
             statement.setString(1, "%a%");
@@ -47,21 +49,22 @@ public class RecipeService {
             startMillis = System.currentTimeMillis();
             try (ResultSet rs = statement.executeQuery()) {
                 endMillis = System.currentTimeMillis();
+                duration = endMillis - startMillis;
 
-                log.info("time: {}", endMillis - startMillis);
+                log.info("JDBC time: {}", duration);
 
                 while (rs.next()) {
                     map.put(rs.getString("col_0_0_"), rs.getLong("col_1_0_"));
                 }
 
-                log.info("Size: {}", map.size());
+                log.info("JDBC size: {}", map.size());
             }
         }
 
-        return "JDBC done";
+        return duration;
     }
 
-    public String getAggregatesByHttpClickhouse() {
+    public Long getAggregatesByHttpClickhouse() {
 
         Map<String, Long> map = new HashMap<>();
 
@@ -72,6 +75,7 @@ public class RecipeService {
 
         long startMillis = System.currentTimeMillis();
         long endMillis;
+        long duration;
 
         try (ClickHouseClient client = ClickHouseClient.newInstance(ClickHouseProtocol.HTTP);
              ClickHouseResponse response = client.connect(endpoint)
@@ -80,27 +84,28 @@ public class RecipeService {
                      .params("\'%a%\'", "\'%e%\'").execute().get()) {
 
             endMillis = System.currentTimeMillis();
+            duration = endMillis - startMillis;
 
-            log.info("time: {}", endMillis - startMillis);
+            log.info("Http ClickHouse time: {}", duration);
 
             for (ClickHouseRecord r : response.records()) {
                 map.put(r.getValue(0).asString(), r.getValue(1).asLong());
             }
 
-            log.info("Size: {}", map.size());
+            log.info("Http ClickHouse size: {}", map.size());
 
         } catch (ExecutionException | InterruptedException e) {
             throw new RuntimeException(e);
         }
-        return "ClickHouse done";
+        return duration;
     }
 
-    public String getAggregatesByJavaSpec() {
-        getAggregatesMapByJavaSpec();
-        return "Spec done";
+    public Long getAggregatesByJavaSpec() {
+        var result = getAggregatesMapByJavaSpec();
+        return result.getRight();
     }
 
-    private Map<String, Long> getAggregatesMapByJavaSpec() {
+    private Pair<Map<String, Long>, Long> getAggregatesMapByJavaSpec() {
         return recipeRepository.groupAndCountHaving(Recipe_.title, RecipeSpecification.createSpecificationByParams
                 (RecipeConditionDTO.builder().nameLikePattern("a").build()));
     }

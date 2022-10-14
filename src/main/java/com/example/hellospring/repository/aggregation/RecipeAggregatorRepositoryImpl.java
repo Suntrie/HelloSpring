@@ -3,6 +3,7 @@ package com.example.hellospring.repository.aggregation;
 import com.example.hellospring.domain.entities.Recipe;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +23,7 @@ public class RecipeAggregatorRepositoryImpl implements RecipeAggregatorRepositor
     private final EntityManager entityManager;
 
     @Override
-    public Map<String, Long> groupAndCountHaving(SingularAttribute<Recipe, String> singularAttribute, Specification<Recipe> where)
+    public Pair<Map<String, Long>, Long> groupAndCountHaving(SingularAttribute<Recipe, String> singularAttribute, Specification<Recipe> where)
     {
         final CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         final CriteriaQuery<Tuple> query = criteriaBuilder.createQuery(Tuple.class);
@@ -51,16 +52,20 @@ public class RecipeAggregatorRepositoryImpl implements RecipeAggregatorRepositor
         query.orderBy(criteriaBuilder.asc(sortExpression));
 
         long startMillis = System.currentTimeMillis();
+        long duration;
+
         final List<Tuple> resultList = entityManager.createQuery(query).getResultList();
         long endMillis = System.currentTimeMillis();
 
-        log.info("time: {}", endMillis - startMillis);
-        log.info("Size: {}", resultList.size());
+        duration = endMillis - startMillis;
 
-        return resultList.stream().
+        log.info("Hibernate time: {}", duration);
+        log.info("Hibernate size: {}", resultList.size());
+
+        return Pair.of(resultList.stream().
                 collect(toMap(
                         t -> t.get(0, String.class),
                         t -> t.get(1, Long.class))
-                );
+                ), duration);
     }
 }
