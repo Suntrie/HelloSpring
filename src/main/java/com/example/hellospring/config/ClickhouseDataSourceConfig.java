@@ -4,8 +4,8 @@ import com.clickhouse.client.config.ClickHouseClientOption;
 import com.clickhouse.jdbc.ClickHouseDataSource;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import javassist.NotFoundException;
 import lombok.Data;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -64,6 +64,7 @@ public class ClickhouseDataSourceConfig {
         properties.setProperty(ClickHouseClientOption.CLIENT_NAME.getKey(), username);
         properties.setProperty("user", username);
         properties.setProperty("password", password);
+        //properties.setProperty("transactionSupported", "true");
 
         return new ClickHouseDataSource(url, properties);
     }

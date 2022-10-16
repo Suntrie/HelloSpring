@@ -10,13 +10,25 @@ spring:
     maximum-pool-size: 5
 
   jpa:
+    hibernate:
+      #            ddl-auto: validate
+      naming:
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    open-in-view: false
+    show-sql: true
+    #properties:
+      #hibernate.allow_update_outside_transaction: true
+      #Are transactions required? Since Hibernate bulk insert wouldn't work (driver doesn't support them)
+      # support by Clickhouse is really limited: "INSERT into one partition in one table of MergeTree family up to max_insert_size rows is transactional (ACID)"
+    properties:
       hibernate:
-        #            ddl-auto: validate
-        naming:
-          implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
-          physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-      open-in-view: false
-      show-sql: false
+        order_inserts: true
+        jdbc:
+          batch_size: 100
+        #  order_inserts: true
+        order_updates: true
+        generate_statistics: true
 
 logging:
   level:

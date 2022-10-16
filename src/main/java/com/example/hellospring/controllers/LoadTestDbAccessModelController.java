@@ -1,14 +1,13 @@
 package com.example.hellospring.controllers;
 
 import com.example.hellospring.services.RecipeService;
+import com.example.hellospring.services.VetService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -22,6 +21,7 @@ import java.util.concurrent.Callable;
 public class LoadTestDbAccessModelController {
 
     private final RecipeService recipeService;
+    private final VetService vetService;
 
     /*Оконная функция на основе спецификаций Java*/
     @GetMapping("/java-spec/aggregates")
@@ -71,5 +71,24 @@ public class LoadTestDbAccessModelController {
         }
 
         return "test done";
+    }
+
+    @GetMapping("/java-spec/title-multiple-pk")
+    @ResponseStatus(HttpStatus.OK)
+    public String getByTitle() {
+        return recipeService.findByTitle();
+    }
+
+    @Transactional
+    @PostMapping("/java-spec/insert-new-vet")
+    @ResponseStatus(HttpStatus.OK)
+    public void generateNew() throws Exception {
+         vetService.generate100kVet();
+    }
+
+    @GetMapping("/java-spec/all-vets")
+    @ResponseStatus(HttpStatus.OK)
+    public String getAllVets() {
+        return vetService.getAllVets();
     }
 }

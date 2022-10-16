@@ -111,4 +111,7 @@ public class RecipeService {
     }
 
 
+    public String findByTitle() {
+        return recipeRepository.findByTitle("Burgoo").toString();
+    }
 }
