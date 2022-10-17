@@ -11,8 +11,7 @@ CREATE TABLE tutorial.katze
 
 ) ENGINE = MergeTree()
 PARTITION BY catId
-ORDER BY (catId)
-SAMPLE BY intHash32(catId);
+ORDER BY (catId);
 
 INSERT INTO tutorial.katze (*)
 VALUES (1, 'gavochka');

@@ -21,7 +21,6 @@ import java.util.concurrent.Callable;
 public class LoadTestDbAccessModelController {
 
     private final RecipeService recipeService;
-    private final VetService vetService;
 
     /*Оконная функция на основе спецификаций Java*/
     @GetMapping("/java-spec/aggregates")
@@ -77,18 +76,5 @@ public class LoadTestDbAccessModelController {
     @ResponseStatus(HttpStatus.OK)
     public String getByTitle() {
         return recipeService.findByTitle();
-    }
-
-    @Transactional
-    @PostMapping("/java-spec/insert-new-vet")
-    @ResponseStatus(HttpStatus.OK)
-    public void generateNew() throws Exception {
-         vetService.generate100kVet();
-    }
-
-    @GetMapping("/java-spec/all-vets")
-    @ResponseStatus(HttpStatus.OK)
-    public String getAllVets() {
-        return vetService.getAllVets();
     }
 }
